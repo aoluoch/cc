@@ -1,64 +1,52 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import Upload from "./Upload"
+import Upload from "./Upload";
 import Video from "./Video";
 
 function ReportIncident({ user }) {
   const [description, setDescription] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [imageUrls, setImageUrls] = useState([]);
-  const [videoUrls, setVideoUrls] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedVideos, setUploadedVideos] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
+    const incidentData = {
       description,
       latitude,
       longitude,
-      images: imageUrls,
-      videos: videoUrls,
+      images: uploadedImages,
+      videos: uploadedVideos,
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/incidents", payload, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:5000/incidents",
+        incidentData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Incident reported successfully!");
         setDescription("");
         setLatitude("");
         setLongitude("");
-        setImageUrls([]);
-        setVideoUrls([]);
+        setUploadedImages([]);
+        setUploadedVideos([]);
       } else {
         toast.error("Failed to report the incident.");
       }
     } catch (error) {
       toast.error("An error occurred while submitting the incident.");
     }
-  };
-
-  const handleAddUrl = (setter) => {
-    setter((urls) => [...urls, ""]);
-  };
-
-  const handleUrlChange = (setter, index, value) => {
-    setter((urls) => {
-      const updatedUrls = [...urls];
-      updatedUrls[index] = value;
-      return updatedUrls;
-    });
-  };
-
-  const handleRemoveUrl = (setter, index) => {
-    setter((urls) => urls.filter((_, i) => i !== index));
   };
 
   return (
@@ -95,46 +83,36 @@ function ReportIncident({ user }) {
           />
         </div>
         <div>
-          <label className="block text-gray-700">Image Upload</label>
-          {imageUrls.map((url, index) => (
-            <div key={index} className="flex items-center space-x-2 mb-2">
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={url}
-                onChange={(e) => handleUrlChange(setImageUrls, index, e.target.value)}
+          <label className="block text-gray-700 mb-2">Upload Images</label>
+          <Upload
+            incidentId="new" // Replace with incident ID if necessary
+            onUpload={(url) => setUploadedImages((prev) => [...prev, url])}
+          />
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            {uploadedImages.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt="Uploaded"
+                className="w-full h-32 object-cover rounded"
               />
-              <button
-                type="button"
-                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                onClick={() => handleRemoveUrl(setImageUrls, index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <Upload />
+            ))}
+          </div>
         </div>
         <div>
-          <label className="block text-gray-700">Video URLs</label>
-          {videoUrls.map((url, index) => (
-            <div key={index} className="flex items-center space-x-2 mb-2">
-              <input
-                type="text"
-                className="w-full p-2 border rounded"
-                value={url}
-                onChange={(e) => handleUrlChange(setVideoUrls, index, e.target.value)}
-              />
-              <button
-                type="button"
-                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                onClick={() => handleRemoveUrl(setVideoUrls, index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          <Video/>
+          <label className="block text-gray-700 mb-2">Upload Videos</label>
+          <Video
+            incidentId="new" // Replace with incident ID if necessary
+            onUpload={(url) => setUploadedVideos((prev) => [...prev, url])}
+          />
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            {uploadedVideos.map((video, index) => (
+              <video key={index} controls className="w-full h-32 rounded">
+                <source src={video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ))}
+          </div>
         </div>
         <button
           type="submit"
