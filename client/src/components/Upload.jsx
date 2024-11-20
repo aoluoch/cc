@@ -22,7 +22,7 @@ function Upload({ incidentId, onUpload }) {
                 if (error) {
                     console.error(error);
                 } else if (result.event === 'success') {
-                    console.log('File uploaded');
+                    console.log('Image uploaded');
 
                     const { secure_url } = result.info;
 

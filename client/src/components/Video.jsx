@@ -22,7 +22,7 @@ function Video({ incidentId, onUpload }) {
                 if (error) {
                     console.error(error);
                 } else if (result.event === 'success') {
-                    console.log('File uploaded');
+                    console.log('Video uploaded');
 
                     const { secure_url } = result.info;
 
