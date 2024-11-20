@@ -24,7 +24,7 @@ function ReportIncident({ user }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/incidents",
+        `http://localhost:5000/incidents/${incidentId}`,
         incidentData,
         {
           headers: {

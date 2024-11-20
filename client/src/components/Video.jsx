@@ -34,7 +34,7 @@ function Video({ incidentId, onUpload }) {
                     try {
                         // Post to the incident video endpoint
                         const response = await axios.post(
-                            `/incidents/${incidentId}/videos`,
+                            `/incidents/${incident_id}/videos/${video_id}`,
                             payload,
                             {
                                 withCredentials: true,
