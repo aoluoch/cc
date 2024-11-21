@@ -43,7 +43,7 @@ function Upload({ incidentId, onUpload }) {
                         
 
                         if (response.status === 201) {
-                            console.log('Incident image saved');
+                            console.log('Incident image saved', response);
                             onUpload(secure_url); // Trigger the parent handler
                         }
                     } catch (error) {

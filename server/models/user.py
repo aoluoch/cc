@@ -5,7 +5,7 @@ from models.extensions import db
 class User(db.Model, SerializerMixin,):
     __tablename__ = 'users'
 
-    serialize_rules = ('-reports',)
+    serialize_rules = ('-reports','-password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)

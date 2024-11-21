@@ -82,6 +82,20 @@ class UserRegisterResource(Resource):
             db.session.rollback()
             return {'message': f'Error creating user: {str(e)}'}, 500
 
+class UserResource(Resource):
+    def get(self, user_id=None):
+        if user_id is None:
+            # Return all users
+            users = [user.to_dict() for user in User.query.all()]
+            return jsonify(users)
+        else:
+            # Fetch a single user by ID
+            user = User.query.get(user_id)
+            if user is None:
+                return {'message': f'User with ID {user_id} not found'}, 404
+            return jsonify(user.to_dict())
+
+
 class UserLoginResource(Resource):
     def post(self):
         data = request.get_json()
@@ -246,7 +260,8 @@ class IncidentVideoSingleResource(Resource):
         return make_response({"message": "Incident video deleted"}, 204)
 
 # ------------------------- API Routes Setup -------------------------
-api.add_resource(UserRegisterResource, '/users')
+api.add_resource(UserResource, "/users", "/users/<int:user_id>")
+api.add_resource(UserRegisterResource, '/register')
 api.add_resource(UserLoginResource, '/login')
 api.add_resource(UserLogoutResource, '/logout')
 api.add_resource(IncidentListResource, '/incidents')
