@@ -11,8 +11,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import timedelta
 
-
-
 # Create Flask app and API
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://localhost:5174"])
@@ -28,7 +26,6 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)  # Session lasts 1 
 # Initialize the database
 db.init_app(app)
 migrate = Migrate(app, db)
-
 
 # ---------------- Session Helper Functions ----------------
 def login_required(f):
@@ -161,7 +158,6 @@ class IncidentResource(Resource):
 
         data = request.get_json()
         incident.description = data.get('description', incident.description)
-        incident.status = data.get('status', incident.status) if session.get('is_admin') else incident.status
         incident.latitude = data.get('latitude', incident.latitude)
         incident.longitude = data.get('longitude', incident.longitude)
 
@@ -172,7 +168,7 @@ class IncidentResource(Resource):
     def delete(self, id):
         incident = IncidentReport.query.get_or_404(id)
 
-        if incident.user_id != session.get('user_id') and not session.get('is_admin'):
+        if incident.user_id != session.get('user_id'):
             return make_response({"message": "Permission denied"}, 403)
 
         # Delete associated images and videos
@@ -214,7 +210,7 @@ class IncidentImageSingleResource(Resource):
         image = IncidentImage.query.filter_by(report_id=incident_id, id=image_id).first_or_404()
         report = IncidentReport.query.get(image.report_id)
 
-        if report.user_id != session.get('user_id') and not session.get('is_admin'):
+        if report.user_id != session.get('user_id'):
             return make_response({"message": "Permission denied"}, 403)
 
         db.session.delete(image)
@@ -242,7 +238,7 @@ class IncidentVideoSingleResource(Resource):
         video = IncidentVideo.query.filter_by(report_id=incident_id, id=video_id).first_or_404()
         report = IncidentReport.query.get(video.report_id)
 
-        if report.user_id != session.get('user_id') and not session.get('is_admin'):
+        if report.user_id != session.get('user_id'):
             return make_response({"message": "Permission denied"}, 403)
 
         db.session.delete(video)
@@ -261,4 +257,4 @@ api.add_resource(IncidentVideoResource, '/incidents/<int:incident_id>/videos')
 api.add_resource(IncidentVideoSingleResource, '/incidents/<int:incident_id>/videos/<int:video_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(port=5000, debug=True)

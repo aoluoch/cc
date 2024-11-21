@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import Upload from "./Upload";
-import Video from "./Video";
 
 function ReportIncident({ user }) {
   const [description, setDescription] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [uploadedVideos, setUploadedVideos] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,13 +14,11 @@ function ReportIncident({ user }) {
       description,
       latitude,
       longitude,
-      images: uploadedImages,
-      videos: uploadedVideos,
     };
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/incidents/${incidentId}`,
+        `http://127.0.0.1:5000/incidents`,
         incidentData,
         {
           headers: {
@@ -39,8 +33,6 @@ function ReportIncident({ user }) {
         setDescription("");
         setLatitude("");
         setLongitude("");
-        setUploadedImages([]);
-        setUploadedVideos([]);
       } else {
         toast.error("Failed to report the incident.");
       }
@@ -81,38 +73,6 @@ function ReportIncident({ user }) {
             onChange={(e) => setLongitude(e.target.value)}
             required
           />
-        </div>
-        <div>
-          <label className="block text-gray-700 mb-2">Upload Images</label>
-          <Upload
-            incidentId="new" // Replace with incident ID if necessary
-            onUpload={(url) => setUploadedImages((prev) => [...prev, url])}
-          />
-          <div className="mt-4 grid grid-cols-3 gap-4">
-            {uploadedImages.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt="Uploaded"
-                className="w-full h-32 object-cover rounded"
-              />
-            ))}
-          </div>
-        </div>
-        <div>
-          <label className="block text-gray-700 mb-2">Upload Videos</label>
-          <Video
-            incidentId="new" // Replace with incident ID if necessary
-            onUpload={(url) => setUploadedVideos((prev) => [...prev, url])}
-          />
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            {uploadedVideos.map((video, index) => (
-              <video key={index} controls className="w-full h-32 rounded">
-                <source src={video} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ))}
-          </div>
         </div>
         <button
           type="submit"
